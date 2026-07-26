@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import '../globals.css';
@@ -49,9 +49,14 @@ const ReviewsPage = () => {
     }, []);
 
     const fetchReviews = async () => {
-        const reviewsQuery = query(collection(db, "reviews"), orderBy("timestamp", "desc"));
-        const reviewsSnapshot = await getDocs(reviewsQuery);
-        setReviews(reviewsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+        try {
+            const res = await fetch('/api/reviews');
+            if (!res.ok) throw new Error('Failed to fetch');
+            const data = await res.json();
+            setReviews(data.map((r: any) => ({ ...r, timestamp: r.timestamp ? new Date(r.timestamp) : null })));
+        } catch (err) {
+            console.error('Error fetching reviews', err);
+        }
     };
 
     useEffect(() => {
@@ -75,12 +80,12 @@ const ReviewsPage = () => {
                 setEditingReview(null);
                 setSuccess('Review updated successfully!');
             } else {
-                await addDoc(collection(db, "reviews"), {
-                    ...newReview,
-                    timestamp: serverTimestamp(),
-                    approved: false,
-                    userToken: userToken,
+                const res = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...newReview, userToken }),
                 });
+                if (!res.ok) throw new Error('Submission failed');
                 setSuccess('Your review has been submitted for approval. Thank you!');
             }
             setNewReview({ name: '', rating: 5, text: '' });
@@ -116,9 +121,12 @@ const ReviewsPage = () => {
     return (
         <div className="container" style={{padding: '50px 0'}}>
             <h1 style={{textAlign: 'center', marginBottom: '50px'}}>Customer Reviews</h1>
+            <div style={{textAlign: 'center', marginBottom: '20px'}}>
+                <a href="#reviewForm" className="btn-primary">Skip to Submit Review</a>
+            </div>
             <div className="reviews-layout">
                 <div className="review-form-container glass-card" style={{padding: '30px'}}>
-                    <h2>{editingReview ? 'Edit Your Review' : 'Leave a Review'}</h2>
+                    <h2 id="reviewForm">{editingReview ? 'Edit Your Review' : 'Leave a Review'}</h2>
                     <form onSubmit={handleReviewSubmit}>
                         <div className="form-group">
                             <label htmlFor="name">Your Name</label>
@@ -156,17 +164,23 @@ const ReviewsPage = () => {
                 <div className="reviews-list">
                     {reviews.filter(r => r.approved).map(review => (
                         <div key={review.id} className="review-card glass-card" style={{padding: '20px', marginBottom: '20px'}}>
-                            <div className="review-header">
-                                <strong>{review.name}</strong>
-                                <div className="star-rating">
-                                    {[...Array(5)].map((_, index) => (
-                                        <span key={index} style={{color: index < review.rating ? 'var(--gold)' : '#ccc'}}>★</span>
-                                    ))}
+                            <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
+                                <div style={{display:'flex', gap: '12px', alignItems: 'center'}}>
+                                    <div className="testimonial-avatar">{(review.name || '').substring(0,2).toUpperCase()}</div>
+                                    <div>
+                                        <strong>{review.name}</strong>
+                                        <div style={{display:'flex', alignItems:'center', gap: '8px'}}>
+                                            <div className="star-rating" aria-hidden="true">{[...Array(5)].map((_, i) => (<span key={i} style={{color: i < (review.rating||0) ? 'var(--gold)' : '#e6e6e6'}}>★</span>))}</div>
+                                            {review.featured && <span className="status-badge status-featured">Featured</span>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{textAlign:'right'}}>
+                                    <small style={{color: 'var(--text-muted)'}}>{review.timestamp ? new Date(review.timestamp?.toDate ? review.timestamp.toDate() : review.timestamp).toLocaleDateString() : ''}</small>
                                 </div>
                             </div>
-                            <p>{review.text}</p>
-                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                <small style={{color: 'var(--text-muted)'}}>{new Date(review.timestamp?.toDate()).toLocaleDateString()}</small>
+                            <p style={{marginTop: '12px'}}>{review.text}</p>
+                            <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '8px'}}>
                                 {canEditOrDelete(review) && (
                                     <div>
                                         <button onClick={() => handleEdit(review)} className="btn-outline" style={{marginRight: '10px', padding: '5px 10px', fontSize: '0.8rem'}}>Edit</button>

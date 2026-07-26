@@ -744,23 +744,32 @@ export default function Home() {
         </div>
         <div className="testimonials-track-wrap">
           <div className="testimonials-track" id="testimonials-track">
-            {featuredReviews.length > 0 ? featuredReviews.map(review => (
-                <div className="testimonial-card" key={review.id}>
-                    <div className="testimonial-quote">"</div>
-                    <div className="testimonial-stars">{'★'.repeat(review.rating)}</div>
-                    <p className="testimonial-text">{review.text}</p>
-                    <div className="testimonial-author">
-                        <div className="testimonial-avatar">{review.name.substring(0,2)}</div>
-                        <div>
-                        <div className="testimonial-name">{review.name}</div>
-                        </div>
-                    </div>
+          {featuredReviews.length > 0 ? featuredReviews.map(review => (
+            <div className="testimonial-card" key={review.id}>
+              {review.featured && <div className="testimonial-badge">Featured</div>}
+              <div className="testimonial-quote">"</div>
+              <div className="testimonial-stars" aria-hidden="true">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} style={{color: i < (review.rating || 0) ? 'var(--gold)' : '#e6e6e6'}}>★</span>
+                ))}
+              </div>
+              <p className="testimonial-text">{review.text}</p>
+              <div className="testimonial-author">
+                <div className="testimonial-avatar" aria-hidden="true">{(review.name || '').substring(0,2).toUpperCase()}</div>
+                <div>
+                  <div className="testimonial-name">{review.name}</div>
+                  {review.timestamp && <small className="testimonial-date">{new Date(review.timestamp?.toDate ? review.timestamp.toDate() : review.timestamp).toLocaleDateString()}</small>}
                 </div>
-            )) : <p>No featured reviews yet.</p>}
+              </div>
+            </div>
+          )) : <p>No featured reviews yet.</p>}
           </div>
         </div>
         <div className="testimonials-dots">
           {/* Dots can be dynamically generated based on the number of reviews */}
+        </div>
+        <div style={{textAlign: 'center', marginTop: '18px'}}>
+          <Link href="/reviews" className="btn-outline"><i className="fa-regular fa-star"></i> Leave a review</Link>
         </div>
       </section>
       <section id="contact" aria-labelledby="contact-title">

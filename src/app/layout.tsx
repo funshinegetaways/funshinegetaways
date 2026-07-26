@@ -24,6 +24,14 @@ export default function RootLayout({
           crossOrigin="anonymous" 
           referrerPolicy="no-referrer" 
         />
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function(){
+            try {
+              var theme = localStorage.getItem('siteTheme');
+              if(theme) document.documentElement.classList.add('theme-' + theme);
+            } catch(e) { /* ignore */ }
+          })();
+        `}} />
       </head>
       <body>
         <SectionPageShell>{children}</SectionPageShell>

@@ -61,6 +61,43 @@
     --font-heading: 'Teko', sans-serif;
 }
 
+/* Festival Themes - selectable via admin */
+.theme-diwali {
+  --gold: #ffb74d;
+  --dark-gold: #e68a00;
+  --bg-primary: #120700;
+  --bg-secondary: #2a1200;
+  --bg-tertiary: #3b1a00;
+  --text-primary: #fff8f0;
+  --text-secondary: #fff1e6;
+  --glass-bg: rgba(255, 235, 205, 0.06);
+  --glass-border: rgba(255, 200, 120, 0.12);
+}
+
+.theme-holi {
+  --gold: #ff5da8;
+  --dark-gold: #ff3b7f;
+  --bg-primary: #0b1020;
+  --bg-secondary: #0f1730;
+  --bg-tertiary: #17243b;
+  --text-primary: #f7fbff;
+  --text-secondary: #e8f6ff;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 93, 168, 0.09);
+}
+
+.theme-noel {
+  --gold: #9ee493;
+  --dark-gold: #6fbf61;
+  --bg-primary: #07120a;
+  --bg-secondary: #0a1f13;
+  --bg-tertiary: #123026;
+  --text-primary: #f7fff7;
+  --text-secondary: #e8f7ea;
+  --glass-bg: rgba(16, 32, 24, 0.5);
+  --glass-border: rgba(160, 220, 180, 0.06);
+}
+
 /* ----- Base & Reset ----- */
 * {
     margin: 0;

@@ -108,6 +108,44 @@ const Settings = () => {
         setLoading(false);
     };
 
+    // Theme options
+    const THEMES = [
+        { id: 'diwali', name: 'Diwali Glow', description: 'Warm golden festival lights and rich contrast.' },
+        { id: 'holi', name: 'Holi Splash', description: 'Vibrant colourful palette with playful accents.' },
+        { id: 'noel', name: 'Winter Cheer', description: 'Evergreen and cozy festive tones.' },
+    ];
+    const [currentTheme, setCurrentTheme] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchTheme = async () => {
+            try {
+                const tdoc = await getDoc(doc(db, 'settings', 'siteTheme'));
+                if (tdoc.exists()) setCurrentTheme(tdoc.data().theme || null);
+            } catch (e) { console.error('Failed to load theme', e); }
+        };
+        fetchTheme();
+    }, []);
+
+    const applyThemeLocally = (id: string | null) => {
+        try {
+            document.documentElement.classList.remove('theme-diwali','theme-holi','theme-noel');
+            if (id) { document.documentElement.classList.add('theme-'+id); localStorage.setItem('siteTheme', id); }
+            else localStorage.removeItem('siteTheme');
+        } catch (e) { console.error(e); }
+    };
+
+    const saveTheme = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await setDoc(doc(db, 'settings', 'siteTheme'), { theme: currentTheme }, { merge: true });
+            applyThemeLocally(currentTheme);
+            setSuccessMessage('Theme saved successfully.');
+        } catch (err) {
+            console.error('Failed to save theme', err);
+            setMessage('Failed to save theme.');
+        }
+    };
+
     const handleUpdateEmail = async (newEmail: string) => {
         setSuccessMessage('');
         try {
@@ -247,6 +285,43 @@ const Settings = () => {
                     <button type="submit" className="btn-primary">Save Banner Settings</button>
                 </form>
             </div>
+
+            <div className="glass-card" style={{padding: '30px', marginTop: '20px'}}>
+                <h3>Site Appearance & Themes</h3>
+                <p>Choose a festival theme to apply across the website. Use <strong>Preview</strong> to apply locally without saving.</p>
+                <form onSubmit={saveTheme} style={{marginTop: '12px'}}>
+                    <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap'}}>
+                        {THEMES.map(t => (
+                            <div key={t.id} className="glass-card" style={{padding: '12px', width: '220px'}}>
+                                <strong>{t.name}</strong>
+                                <p style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>{t.description}</p>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px'}}>
+                                    <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                        <input type="radio" name="theme" checked={currentTheme === t.id} onChange={() => setCurrentTheme(t.id)} />
+                                        <span>{currentTheme === t.id ? 'Selected' : 'Select'}</span>
+                                    </label>
+                                    <button type="button" className="btn-outline" onClick={() => { setCurrentTheme(t.id); applyThemeLocally(t.id); }} style={{padding: '8px 12px'}}>Preview</button>
+                                </div>
+                            </div>
+                        ))}
+                        <div className="glass-card" style={{padding: '12px', width: '220px'}}>
+                            <strong>Default</strong>
+                            <p style={{fontSize: '0.85rem', color: 'var(--text-muted)'}}>Revert to the default site theme.</p>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px'}}>
+                                <label style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                    <input type="radio" name="theme" checked={currentTheme === null} onChange={() => setCurrentTheme(null)} />
+                                    <span>{currentTheme === null ? 'Selected' : 'Select'}</span>
+                                </label>
+                                <button type="button" className="btn-outline" onClick={() => { setCurrentTheme(null); applyThemeLocally(null); }} style={{padding: '8px 12px'}}>Preview</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style={{marginTop: '14px'}}>
+                        <button type="submit" className="btn-primary">Save Theme</button>
+                    </div>
+                </form>
+            </div>
+
             <EmailUpdateModal isOpen={isEmailModalOpen} onClose={() => setEmailModalOpen(false)} currentEmail={managerEmail} onSave={handleUpdateEmail} />
         </div>
     );
