@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link 
           rel="stylesheet" 
@@ -27,13 +27,22 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `
           (function(){
             try {
-              var theme = localStorage.getItem('siteTheme');
-              if(theme) document.documentElement.classList.add('theme-' + theme);
-            } catch(e) { /* ignore */ }
+              function applyTheme() {
+                var theme = localStorage.getItem('siteTheme');
+                if (!theme) return;
+                var target = document.body || document.documentElement;
+                if (target) target.classList.add('theme-' + theme);
+              }
+              if (document.body) {
+                applyTheme();
+              } else {
+                document.addEventListener('DOMContentLoaded', applyTheme);
+              }
+            } catch(e) { }
           })();
         `}} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <SectionPageShell>{children}</SectionPageShell>
         <Suspense fallback={null}>
           <Analytics />

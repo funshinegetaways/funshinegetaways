@@ -128,11 +128,23 @@ const Settings = () => {
 
     const applyThemeLocally = (id: string | null) => {
         try {
-            document.documentElement.classList.remove('theme-diwali','theme-holi','theme-noel');
-            if (id) { document.documentElement.classList.add('theme-'+id); localStorage.setItem('siteTheme', id); }
-            else localStorage.removeItem('siteTheme');
-        } catch (e) { console.error(e); }
+            document.body.classList.remove('theme-diwali','theme-holi','theme-noel');
+            if (id) {
+                document.body.classList.add('theme-' + id);
+                localStorage.setItem('siteTheme', id);
+            } else {
+                localStorage.removeItem('siteTheme');
+            }
+        } catch (e) {
+            console.error('Failed to apply theme locally', e);
+        }
     };
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            applyThemeLocally(currentTheme);
+        }
+    }, [currentTheme]);
 
     const saveTheme = async (e: React.FormEvent) => {
         e.preventDefault();
