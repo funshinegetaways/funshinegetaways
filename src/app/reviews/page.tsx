@@ -115,18 +115,46 @@ const ReviewsPage = () => {
     const canEditOrDelete = (review: any) => {
         if (review.userToken !== userToken) return false;
         const sevenDays = 7 * 24 * 60 * 60 * 1000;
-        return (Date.now() - review.timestamp?.toDate().getTime()) < sevenDays;
-    }
+        const reviewTime = review.timestamp instanceof Date
+            ? review.timestamp.getTime()
+            : review.timestamp?.toDate?.().getTime?.() || 0;
+        return reviewTime > 0 && (Date.now() - reviewTime) < sevenDays;
+    };
+
+    const approvedReviews = reviews.filter((r) => r.approved);
+    const averageRating = approvedReviews.length
+        ? (approvedReviews.reduce((acc, review) => acc + (Number(review.rating) || 0), 0) / approvedReviews.length).toFixed(1)
+        : '0.0';
 
     return (
-        <div className="container" style={{padding: '50px 0'}}>
-            <h1 style={{textAlign: 'center', marginBottom: '50px'}}>Customer Reviews</h1>
-            <div style={{textAlign: 'center', marginBottom: '20px'}}>
-                <a href="#reviewForm" className="btn-primary">Skip to Submit Review</a>
+        <div className="reviews-page-shell">
+            <div className="reviews-hero glass-card">
+                <div className="reviews-hero-copy">
+                    <span className="section-tag">Rider Voices</span>
+                    <h1>Stories from the road, shared by our riders.</h1>
+                    <p>Every review helps future riders discover the thrill of Royal Enfield and the experience at our showroom.</p>
+                    <a href="#reviewForm" className="btn-primary">Write a Review</a>
+                </div>
+                <div className="reviews-hero-stats">
+                    <div className="review-stat">
+                        <strong>{approvedReviews.length}</strong>
+                        <span>Approved stories</span>
+                    </div>
+                    <div className="review-stat">
+                        <strong>{averageRating}</strong>
+                        <span>Average rating</span>
+                    </div>
+                    <div className="review-stat">
+                        <strong>{reviews.length}</strong>
+                        <span>Total submissions</span>
+                    </div>
+                </div>
             </div>
+
             <div className="reviews-layout">
-                <div className="review-form-container glass-card" style={{padding: '30px'}}>
+                <div className="review-form-container glass-card">
                     <h2 id="reviewForm">{editingReview ? 'Edit Your Review' : 'Leave a Review'}</h2>
+                    <p className="review-form-subtitle">Tell us how your experience felt — from the showroom to the ride.</p>
                     <form onSubmit={handleReviewSubmit}>
                         <div className="form-group">
                             <label htmlFor="name">Your Name</label>
@@ -142,7 +170,7 @@ const ReviewsPage = () => {
                                             type="button"
                                             key={ratingValue}
                                             onClick={() => setNewReview({ ...newReview, rating: ratingValue })}
-                                            style={{ background: 'none', border: 'none', padding: '0', cursor: 'pointer', color: ratingValue <= newReview.rating ? 'var(--gold)' : '#ccc', fontSize: '2rem', lineHeight: '1' }}
+                                            className="star-button"
                                             aria-label={`Rate ${ratingValue} out of 5 stars`}
                                         >
                                             ★
@@ -155,41 +183,53 @@ const ReviewsPage = () => {
                             <label htmlFor="reviewText">Your Review</label>
                             <textarea id="reviewText" value={newReview.text} onChange={(e) => setNewReview({...newReview, text: e.target.value})} required></textarea>
                         </div>
-                        <button type="submit" className="btn-primary">{editingReview ? 'Update Review' : 'Submit Review'}</button>
-                        {editingReview && <button onClick={() => { setEditingReview(null); setNewReview({ name: '', rating: 5, text: '' }); }} className="btn-outline" style={{marginLeft: '10px'}}>Cancel</button>}
+                        <div className="review-form-actions">
+                            <button type="submit" className="btn-primary">{editingReview ? 'Update Review' : 'Submit Review'}</button>
+                            {editingReview && <button onClick={() => { setEditingReview(null); setNewReview({ name: '', rating: 5, text: '' }); }} className="btn-outline">Cancel</button>}
+                        </div>
                         {error && <p className="error-message">{error}</p>}
                         {success && <p className="success-message">{success}</p>}
                     </form>
                 </div>
+
                 <div className="reviews-list">
-                    {reviews.filter(r => r.approved).map(review => (
-                        <div key={review.id} className="review-card glass-card" style={{padding: '20px', marginBottom: '20px'}}>
-                            <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
-                                <div style={{display:'flex', gap: '12px', alignItems: 'center'}}>
+                    <div className="reviews-list-header">
+                        <h3>Recent rider stories</h3>
+                        <p>Approved reviews appear here for everyone to see.</p>
+                    </div>
+                    {approvedReviews.length > 0 ? approvedReviews.map(review => (
+                        <div key={review.id} className="review-card glass-card">
+                            <div className="review-card-header">
+                                <div className="review-card-author">
                                     <div className="testimonial-avatar">{(review.name || '').substring(0,2).toUpperCase()}</div>
                                     <div>
                                         <strong>{review.name}</strong>
-                                        <div style={{display:'flex', alignItems:'center', gap: '8px'}}>
-                                            <div className="star-rating" aria-hidden="true">{[...Array(5)].map((_, i) => (<span key={i} style={{color: i < (review.rating||0) ? 'var(--gold)' : '#e6e6e6'}}>★</span>))}</div>
+                                        <div className="review-card-meta">
+                                            <div className="star-rating" aria-hidden="true">{[...Array(5)].map((_, i) => (<span key={i} style={{color: i < (review.rating || 0) ? 'var(--gold)' : '#e6e6e6'}}>★</span>))}</div>
                                             {review.featured && <span className="status-badge status-featured">Featured</span>}
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{textAlign:'right'}}>
-                                    <small style={{color: 'var(--text-muted)'}}>{review.timestamp ? new Date(review.timestamp?.toDate ? review.timestamp.toDate() : review.timestamp).toLocaleDateString() : ''}</small>
+                                <div className="review-card-date">
+                                    <small>{review.timestamp ? new Date(review.timestamp instanceof Date ? review.timestamp : review.timestamp.toDate ? review.timestamp.toDate() : review.timestamp).toLocaleDateString() : ''}</small>
                                 </div>
                             </div>
-                            <p style={{marginTop: '12px'}}>{review.text}</p>
-                            <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: '8px'}}>
+                            <p className="review-card-body">{review.text}</p>
+                            <div className="review-card-footer">
                                 {canEditOrDelete(review) && (
                                     <div>
-                                        <button onClick={() => handleEdit(review)} className="btn-outline" style={{marginRight: '10px', padding: '5px 10px', fontSize: '0.8rem'}}>Edit</button>
-                                        <button onClick={() => handleDelete(review.id)} className="btn-delete" style={{padding: '5px 10px', fontSize: '0.8rem'}}>Delete</button>
+                                        <button onClick={() => handleEdit(review)} className="btn-outline review-action-btn">Edit</button>
+                                        <button onClick={() => handleDelete(review.id)} className="btn-delete review-action-btn">Delete</button>
                                     </div>
                                 )}
                             </div>
                         </div>
-                    ))}
+                    )) : (
+                        <div className="review-empty glass-card">
+                            <h4>No approved reviews yet</h4>
+                            <p>Be the first to share your experience and help others discover us.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

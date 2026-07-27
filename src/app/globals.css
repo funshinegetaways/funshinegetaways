@@ -1737,7 +1737,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* ----- Testimonials ----- */
 #testimonials {
     padding: 120px 0;
-    background: var(--bg-secondary);
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(255,255,255,0.02) 100%);
     overflow: hidden;
 }
 
@@ -1753,11 +1753,37 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .testimonial-card {
     width: 400px;
-    background: var(--bg-primary);
+    background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
     padding: 32px;
-    border-radius: 12px;
+    border-radius: 20px;
     border: 1px solid var(--glass-border);
     flex-shrink: 0;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.testimonial-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.14), transparent 50%);
+    pointer-events: none;
+}
+
+.testimonial-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(201,168,76,0.16);
+    border: 1px solid rgba(201,168,76,0.24);
+    color: var(--gold);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .testimonial-quote {
@@ -1770,12 +1796,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .testimonial-stars {
     color: var(--gold);
     margin: 16px 0;
+    letter-spacing: 0.12em;
 }
 
 .testimonial-text {
     font-style: italic;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin-bottom: 24px;
+    min-height: 90px;
 }
 
 .testimonial-author {
@@ -1788,22 +1816,214 @@ input[type="range"]::-webkit-slider-thumb:hover {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: var(--gold);
+    background: linear-gradient(135deg, var(--gold), var(--dark-gold));
     color: var(--text-inverted);
     display: grid;
     place-items: center;
     font-weight: 700;
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    box-shadow: 0 8px 18px rgba(201,168,76,0.24);
 }
 
 .testimonial-name {
     font-weight: 700;
 }
 
+.testimonial-date {
+    display: block;
+    margin-top: 3px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
 .testimonial-city {
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+/* ----- Reviews Page ----- */
+.reviews-page-shell {
+    padding: 32px 0 80px;
+}
+
+.reviews-hero {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 24px;
+    padding: 32px;
+    margin-bottom: 28px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.16), rgba(255,255,255,0.03));
+}
+
+.reviews-hero-copy h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 3vw, 2.6rem);
+    margin: 10px 0 10px;
+}
+
+.reviews-hero-copy p {
+    color: var(--text-secondary);
+    max-width: 620px;
+}
+
+.reviews-hero-stats {
+    display: grid;
+    gap: 12px;
+}
+
+.review-stat {
+    padding: 16px 18px;
+    border-radius: 16px;
+    background: rgba(0,0,0,0.16);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.review-stat strong {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    color: var(--gold);
+}
+
+.review-stat span {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.reviews-layout {
+    display: grid;
+    grid-template-columns: 0.95fr 1.25fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.review-form-container,
+.review-card,
+.review-empty {
+    border-radius: 24px;
+    padding: 24px;
+}
+
+.review-form-container {
+    position: sticky;
+    top: 90px;
+}
+
+.review-form-subtitle {
+    margin-top: 8px;
+    margin-bottom: 18px;
+    color: var(--text-muted);
+}
+
+.star-rating {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.star-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: #cfcfcf;
+    font-size: 2rem;
+    line-height: 1;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.star-button:hover,
+.star-button:focus-visible {
+    transform: scale(1.08);
+    color: var(--gold);
+}
+
+.review-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.reviews-list {
+    display: grid;
+    gap: 16px;
+}
+
+.reviews-list-header {
+    margin-bottom: 4px;
+}
+
+.reviews-list-header h3 {
+    font-family: var(--font-heading);
+    font-size: 1.45rem;
+    margin-bottom: 4px;
+}
+
+.reviews-list-header p {
+    color: var(--text-muted);
+}
+
+.review-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025));
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+}
+
+.review-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.review-card-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.review-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.review-card-body {
+    margin-top: 14px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+.review-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.review-action-btn {
+    padding: 7px 12px;
+    font-size: 0.78rem;
+    margin-left: 8px;
+}
+
+.review-empty {
+    text-align: center;
+    border: 1px dashed var(--glass-border);
+}
+
+@media (max-width: 900px) {
+    .reviews-hero,
+    .reviews-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .review-form-container {
+        position: static;
+    }
 }
 
 

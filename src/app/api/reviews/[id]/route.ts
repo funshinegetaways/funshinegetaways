@@ -18,12 +18,12 @@ async function requireAdmin(req: NextRequest) {
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin(req);
   if (!auth.ok) return NextResponse.json({ error: auth.msg || 'Unauthorized' }, { status: auth.status || 401 });
 
   try {
-    const id = params.id;
+    const { id } = await params;
     const body = await req.json();
     const updates: any = {};
     if (typeof body.approved === 'boolean') updates.approved = body.approved;
@@ -38,12 +38,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin(req);
   if (!auth.ok) return NextResponse.json({ error: auth.msg || 'Unauthorized' }, { status: auth.status || 401 });
 
   try {
-    const id = params.id;
+    const { id } = await params;
     await adminDb.collection(COLLECTION).doc(id).delete();
     return NextResponse.json({ ok: true });
   } catch (err) {

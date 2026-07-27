@@ -1,30 +1,62 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { admin, db as adminDb } from '../../../lib/firebase-admin';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, query, where, addDoc, serverTimestamp } from 'firebase/firestore';
 
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
 const COLLECTION = 'reviews';
 
 function sanitize(text: string) {
   return text.replace(/<[^>]*>?/gm, '').trim();
 }
 
+function toIsoString(value: any) {
+  if (!value) return null;
+  if (typeof value.toDate === 'function') {
+    return value.toDate().toISOString();
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  return null;
+}
+
 export async function GET() {
   try {
-    const snapshot = await adminDb.collection(COLLECTION).where('approved', '==', true).orderBy('timestamp', 'desc').get();
-    const reviews = snapshot.docs.map(doc => {
-      const data: any = doc.data();
-      return {
-        id: doc.id,
-        name: data.name || '',
-        rating: data.rating || 0,
-        text: data.text || '',
-        featured: !!data.featured,
-        timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : null,
-      };
-    });
+    const reviewsQuery = query(collection(db, COLLECTION), where('approved', '==', true));
+    const reviewsSnapshot = await getDocs(reviewsQuery);
+
+    const reviews = reviewsSnapshot.docs
+      .map((docSnapshot) => {
+        const data: any = docSnapshot.data();
+        return {
+          id: docSnapshot.id,
+          name: data.name || '',
+          rating: data.rating || 0,
+          text: data.text || '',
+          featured: !!data.featured,
+          timestamp: toIsoString(data.timestamp),
+        };
+      })
+      .sort((a, b) => {
+        const aTime = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+        const bTime = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        return bTime - aTime;
+      });
+
     return NextResponse.json(reviews);
   } catch (err) {
     console.error('Error fetching reviews: ', err);
-    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
+    return NextResponse.json([], { status: 200 });
   }
 }
 
@@ -40,29 +72,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing name or text' }, { status: 400 });
     }
 
-    // Simple rate limit: prevent same token posting more than once per 30 seconds
-    if (userToken) {
-      const recentQ = adminDb.collection(COLLECTION).where('userToken', '==', userToken).orderBy('timestamp', 'desc').limit(1);
-      const recentSnap = await recentQ.get();
-      if (!recentSnap.empty) {
-        const last = recentSnap.docs[0].data().timestamp;
-        if (last && last.toDate) {
-          const lastMs = last.toDate().getTime();
-          if (Date.now() - lastMs < 30 * 1000) {
-            return NextResponse.json({ error: 'You are submitting too frequently' }, { status: 429 });
-          }
-        }
-      }
-    }
-
-    const docRef = await adminDb.collection(COLLECTION).add({
+    const docRef = await addDoc(collection(db, COLLECTION), {
       name,
       text,
       rating,
       approved: false,
       featured: false,
       userToken: userToken || null,
-      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      timestamp: serverTimestamp(),
     });
 
     return NextResponse.json({ id: docRef.id });
