@@ -10,6 +10,8 @@ import { buildUrl } from '../../../utils/cloudinary';
 import { getEffectivePrice } from '../../../lib/pricing';
 import { ProductData, CampaignData } from '../../../types';
 
+const defaultSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -37,6 +39,7 @@ const ModelDetailPage = () => {
     const [campaigns, setCampaigns] = useState<CampaignData[]>([]);
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+    const [shareMessage, setShareMessage] = useState('');
 
     useEffect(() => {
         if (id) {
@@ -79,6 +82,29 @@ const ModelDetailPage = () => {
     }
 
     const pricing = getEffectivePrice(product, campaigns);
+
+    const currentPageUrl = typeof window !== 'undefined' ? window.location.href : `${defaultSiteUrl}/model/${product.id}`;
+
+    const handleShare = async () => {
+        const shareData = {
+            title: product.name,
+            text: `${product.name} — starting at ₹${product.price.toLocaleString()} from Funshine Getaways.`,
+            url: currentPageUrl,
+        };
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+                setShareMessage('Shared successfully!');
+            } else {
+                await navigator.clipboard.writeText(currentPageUrl);
+                setShareMessage('Product link copied to clipboard.');
+            }
+        } catch (err) {
+            console.error('Share failed', err);
+            setShareMessage('Unable to share this product right now.');
+        }
+    };
 
       return (
         <div id="about" className="page-shell">
@@ -124,9 +150,15 @@ const ModelDetailPage = () => {
                             </div>
                         )}
                     </div>
-                  <a href="/#test-ride" className="btn-primary">
-                      <i className="fa-regular fa-calendar-check"></i> Book a Test Ride
-                  </a>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+                    <a href="/#test-ride" className="btn-primary">
+                        <i className="fa-regular fa-calendar-check"></i> Book a Test Ride
+                    </a>
+                    <button type="button" onClick={handleShare} className="btn-secondary" style={{ padding: '10px 18px' }}>
+                        <i className="fa-solid fa-share-nodes"></i> Share Model
+                    </button>
+                  </div>
+                  {shareMessage && <p style={{ marginTop: '12px', color: 'var(--text-muted)' }}>{shareMessage}</p>}
               </div>
           </div>
         </div>

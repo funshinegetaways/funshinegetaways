@@ -83,6 +83,24 @@ const Settings = () => {
     const [isEmailModalOpen, setEmailModalOpen] = useState(false);
     const [promoBanner, setPromoBanner] = useState({ enabled: false, text: '', link: '' });
     const [heroImage, setHeroImage] = useState('');
+    const [homepageContent, setHomepageContent] = useState({
+        heroStats: [
+            { id: 'models', value: '15+', label: 'Models Available' },
+            { id: 'riders', value: '5K+', label: 'Happy Riders' },
+            { id: 'partner', value: '18yr', label: 'Authorized Partner' }
+        ],
+        aboutTitle: 'Welcome to Royal Enfield Showroom - Funshine Getaways pvt ltd',
+        aboutParagraphs: [
+            'We are more than a dealership — we are custodians of a century-old legacy.',
+            'Established in 2005, we have grown to become one of the most trusted Royal Enfield authorized dealerships, serving thousands of riders across the region.',
+            'Every person who walks through our doors is welcomed into the Royal Enfield brotherhood — a community bound not by horsepower alone, but by the spirit of adventure.'
+        ],
+        aboutStats: [
+            { id: 'legacy', value: '18', suffix: 'Yrs', label: 'In Business' },
+            { id: 'riders', value: '5000', suffix: '+', label: 'Happy Riders' },
+            { id: 'staff', value: '30', suffix: '+', label: 'Expert Staff' }
+        ]
+    });
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -103,7 +121,16 @@ const Settings = () => {
         }
         const homepageDoc = await getDoc(doc(db, 'settings', 'homepage'));
         if (homepageDoc.exists()) {
-            setHeroImage(homepageDoc.data().heroImage || '');
+            const data = homepageDoc.data() as any;
+            setHeroImage(data.heroImage || '');
+            if (data.homepageContent) {
+                setHomepageContent({
+                    heroStats: data.homepageContent.heroStats || homepageContent.heroStats,
+                    aboutTitle: data.homepageContent.aboutTitle || homepageContent.aboutTitle,
+                    aboutParagraphs: data.homepageContent.aboutParagraphs || homepageContent.aboutParagraphs,
+                    aboutStats: data.homepageContent.aboutStats || homepageContent.aboutStats
+                });
+            }
         }
         setLoading(false);
     };
@@ -187,13 +214,44 @@ const Settings = () => {
         setSuccessMessage('');
         setMessage('');
         try {
-            await setDoc(doc(db, 'settings', 'homepage'), { heroImage: publicId });
+            await setDoc(doc(db, 'settings', 'homepage'), { heroImage: publicId }, { merge: true });
             setHeroImage(publicId);
             setSuccessMessage('Homepage hero image updated successfully!');
         } catch (error) {
             console.error('Failed to update hero image:', error);
             setMessage('Failed to update hero image. Please try again.');
         }
+    };
+
+    const handleHomepageContentSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSuccessMessage('');
+        setMessage('');
+        try {
+            await setDoc(doc(db, 'settings', 'homepage'), { homepageContent }, { merge: true });
+            setSuccessMessage('Homepage content updated successfully!');
+        } catch (error) {
+            console.error('Failed to update homepage content:', error);
+            setMessage('Failed to update homepage content. Please try again.');
+        }
+    };
+
+    const updateHeroStat = (index: number, field: 'value' | 'label', value: string) => {
+        const updated = [...homepageContent.heroStats];
+        updated[index] = { ...updated[index], [field]: value };
+        setHomepageContent({ ...homepageContent, heroStats: updated });
+    };
+
+    const updateAboutStat = (index: number, field: 'value' | 'suffix' | 'label', value: string) => {
+        const updated = [...homepageContent.aboutStats];
+        updated[index] = { ...updated[index], [field]: value };
+        setHomepageContent({ ...homepageContent, aboutStats: updated });
+    };
+
+    const updateAboutParagraph = (index: number, value: string) => {
+        const updated = [...homepageContent.aboutParagraphs];
+        updated[index] = value;
+        setHomepageContent({ ...homepageContent, aboutParagraphs: updated });
     };
     
     const handleDeleteHeroImage = async () => {
@@ -237,6 +295,38 @@ const Settings = () => {
             <div className="glass-card" style={{padding: '30px', marginBottom: '30px'}}>
                 <h3>Homepage Content</h3>
                 <p>Control the dynamic content on your main homepage.</p>
+                <form onSubmit={handleHomepageContentSave} style={{marginTop: '20px'}}>
+                    <div className="form-group">
+                        <label>Hero Section Stats</label>
+                        {homepageContent.heroStats.map((stat, index) => (
+                            <div key={stat.id} style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px'}}>
+                                <input value={stat.value} onChange={(e) => updateHeroStat(index, 'value', e.target.value)} placeholder="Value" />
+                                <input value={stat.label} onChange={(e) => updateHeroStat(index, 'label', e.target.value)} placeholder="Label" />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="form-group">
+                        <label>About Section Title</label>
+                        <input value={homepageContent.aboutTitle} onChange={(e) => setHomepageContent({ ...homepageContent, aboutTitle: e.target.value })} />
+                    </div>
+                    <div className="form-group">
+                        <label>About Section Paragraphs</label>
+                        {homepageContent.aboutParagraphs.map((paragraph, index) => (
+                            <textarea key={index} value={paragraph} onChange={(e) => updateAboutParagraph(index, e.target.value)} rows={3} style={{marginTop: '8px'}} />
+                        ))}
+                    </div>
+                    <div className="form-group">
+                        <label>About Section Stats</label>
+                        {homepageContent.aboutStats.map((stat, index) => (
+                            <div key={stat.id} style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginTop: '10px'}}>
+                                <input value={stat.value} onChange={(e) => updateAboutStat(index, 'value', e.target.value)} placeholder="Value" />
+                                <input value={stat.suffix} onChange={(e) => updateAboutStat(index, 'suffix', e.target.value)} placeholder="Suffix" />
+                                <input value={stat.label} onChange={(e) => updateAboutStat(index, 'label', e.target.value)} placeholder="Label" />
+                            </div>
+                        ))}
+                    </div>
+                    <button type="submit" className="btn-primary">Save Homepage Content</button>
+                </form>
                 <div className="form-group" style={{marginTop: '20px'}}>
                     <label>Hero Section Bike Image</label>
                     <p className="text-muted" style={{fontSize: '0.9rem', marginTop: '-5px', marginBottom: '15px'}}>Recommended aspect ratio: 4:3. This image replaces the default bike image in the hero section.</p>

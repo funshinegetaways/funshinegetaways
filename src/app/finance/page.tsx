@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, query, where, orderBy } from "firebase/firestore";
-import { buildUrl } from '../../utils/cloudinary';
+import { CldImage } from 'next-cloudinary';
 
 // Firebase Config
 const firebaseConfig = {
@@ -125,7 +125,7 @@ const FinancePage = () => {
                 <div className="company-grid">
                     {companies.map(c => (
                         <div key={c.id} className={`company-card ${selectedCompany?.id === c.id ? 'selected' : ''}`} onClick={() => handleCompanySelect(c)}>
-                            <img src={buildUrl(c.logo)} alt={c.name} className="company-logo" />
+                            <CldImage src={c.logo} alt={c.name} className="company-logo" width="100" height="50" objectFit="contain" />
                             <div className="company-name">{c.name}</div>
                             <div className="company-rate">Starts at {c.interestRate}% p.a.</div>
                             {selectedCompany?.id === c.id && <div className="check-icon"><i className="fa-solid fa-check-circle"></i></div>}

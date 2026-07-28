@@ -121,13 +121,21 @@ const ReviewsPage = () => {
         return reviewTime > 0 && (Date.now() - reviewTime) < sevenDays;
     };
 
-    const approvedReviews = reviews.filter((r) => r.approved);
+    const approvedReviews = reviews;
     const averageRating = approvedReviews.length
         ? (approvedReviews.reduce((acc, review) => acc + (Number(review.rating) || 0), 0) / approvedReviews.length).toFixed(1)
         : '0.0';
 
+    const statStyle = {
+        display: 'block',
+        fontFamily: 'var(--font-heading)',
+        fontSize: '1.7rem',
+        color: 'var(--gold)',
+        fontWeight: 700
+    };
+
     return (
-        <div className="reviews-page-shell">
+        <div className="reviews-page-shell" style={{ paddingTop: '110px' }}>
             <div className="reviews-hero glass-card">
                 <div className="reviews-hero-copy">
                     <span className="section-tag">Rider Voices</span>
@@ -137,16 +145,12 @@ const ReviewsPage = () => {
                 </div>
                 <div className="reviews-hero-stats">
                     <div className="review-stat">
-                        <strong>{approvedReviews.length}</strong>
+                        <span style={statStyle}>{approvedReviews.length}</span>
                         <span>Approved stories</span>
                     </div>
                     <div className="review-stat">
-                        <strong>{averageRating}</strong>
+                        <span style={statStyle}>{averageRating}</span>
                         <span>Average rating</span>
-                    </div>
-                    <div className="review-stat">
-                        <strong>{reviews.length}</strong>
-                        <span>Total submissions</span>
                     </div>
                 </div>
             </div>
@@ -203,7 +207,7 @@ const ReviewsPage = () => {
                                 <div className="review-card-author">
                                     <div className="testimonial-avatar">{(review.name || '').substring(0,2).toUpperCase()}</div>
                                     <div>
-                                        <strong>{review.name}</strong>
+                                        <span style={{ fontWeight: 'bold' }}>{review.name}</span>
                                         <div className="review-card-meta">
                                             <div className="star-rating" aria-hidden="true">{[...Array(5)].map((_, i) => (<span key={i} style={{color: i < (review.rating || 0) ? 'var(--gold)' : '#e6e6e6'}}>★</span>))}</div>
                                             {review.featured && <span className="status-badge status-featured">Featured</span>}

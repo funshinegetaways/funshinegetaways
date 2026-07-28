@@ -19,7 +19,7 @@ const AboutPage = () => {
           <div className="about-content">
             <span className="section-tag">Our Story</span>
             <h2 className="section-title" id="about-title">Where Passion<br />Meets Purpose</h2>
-            <p>We are more than a dealership — we are custodians of a century-old legacy. Established in 2005, we
+            <p>We are more than a dealership — we are custodians of a century-old legacy. Established in 2016, we
               have grown to become one of the most trusted Royal Enfield authorized dealerships, serving thousands
               of riders across the region.</p>
             <p>Our state-of-the-art showroom spans over 10,000 sq. ft., featuring the complete Royal Enfield lineup

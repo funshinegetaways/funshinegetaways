@@ -70,14 +70,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                         <li className={pathname.startsWith('/admin/marketing') ? 'active' : ''}>
                             <Link href="/admin/marketing"><i className="fas fa-bullhorn"></i> Marketing</Link>
                             <ul className="submenu">
-                                <li><Link href="/admin/marketing" className={pathname === '/admin/marketing' ? 'sub-active' : ''}>Discount Campaigns</Link></li>
+                                <li><Link href="/admin/marketing" className={pathname === '/admin/marketing' ? 'sub-active' : ''}><i className="fas fa-tags"></i> Discount Campaigns</Link></li>
                             </ul>
                         </li>
                         <li className={pathname.startsWith('/admin/finance') ? 'active' : ''}>
                             <Link href="/admin/finance/companies"><i className="fas fa-hand-holding-usd"></i> Finance</Link>
                             <ul className="submenu">
-                                <li><Link href="/admin/finance/companies" className={pathname === '/admin/finance/companies' ? 'sub-active' : ''}>Finance Companies</Link></li>
-                                <li><Link href="/admin/finance/settings" className={pathname === '/admin/finance/settings' ? 'sub-active' : ''}>Finance Settings</Link></li>
+                                <li><Link href="/admin/finance/companies" className={pathname === '/admin/finance/companies' ? 'sub-active' : ''}><i className="fas fa-building"></i> Finance Companies</Link></li>
+                                <li><Link href="/admin/finance/settings" className={pathname === '/admin/finance/settings' ? 'sub-active' : ''}><i className="fas fa-sliders-h"></i> Finance Settings</Link></li>
                             </ul>
                         </li>
                         <li><Link href="/admin/events" className={pathname.startsWith('/admin/events') ? 'active' : ''}><i className="fas fa-calendar-days"></i> Events</Link></li>

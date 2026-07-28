@@ -1,5 +1,6 @@
 'use client';
 
+import { Metadata } from 'next';
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
@@ -65,6 +66,31 @@ const CampaignBanner = ({ campaign }: { campaign: CampaignData }) => {
     );
 };
 
+export const metadata: Metadata = {
+  title: 'Royal Enfield Showroom | Funshine Getaways',
+  description: 'Authorized Royal Enfield dealership in Sivasagar – explore top Royal Enfield models, book a test ride, and discover finance options.',
+  openGraph: {
+    title: 'Royal Enfield Showroom | Funshine Getaways',
+    description: 'Authorized Royal Enfield dealership in Sivasagar – explore top Royal Enfield models, book a test ride, and discover finance options.',
+    type: 'website',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    siteName: 'Funshine Getaways',
+    images: [
+      {
+        url: process.env.NEXT_PUBLIC_SITE_URL ? `${process.env.NEXT_PUBLIC_SITE_URL}/assets/images/hunter350.png` : 'http://localhost:3000/assets/images/hunter350.png',
+        alt: 'Funshine Getaways Royal Enfield Showroom',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Royal Enfield Showroom | Funshine Getaways',
+    description: 'Authorized Royal Enfield dealership in Sivasagar – explore top Royal Enfield models, book a test ride, and discover finance options.',
+  },
+};
+
 export default function Home() {
   const main = useRef(null);
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -99,6 +125,24 @@ export default function Home() {
   const [totalInterest, setTotalInterest] = useState(0);
   const [promoBanner, setPromoBanner] = useState({ enabled: false, text: '', link: '' });
   const [showPromoBanner, setShowPromoBanner] = useState(false);
+  const [homepageContent, setHomepageContent] = useState({
+    heroStats: [
+      { id: 'models', value: '15+', label: 'Models Available' },
+      { id: 'riders', value: '5K+', label: 'Happy Riders' },
+      { id: 'partner', value: '18yr', label: 'Authorized Partner' }
+    ],
+    aboutTitle: 'Welcome to Royal Enfield Showroom - Funshine Getaways pvt ltd',
+    aboutParagraphs: [
+      'We are more than a dealership — we are custodians of a century-old legacy.',
+      'Established in 2016, we have grown to become one of the most trusted Royal Enfield authorized dealerships, serving thousands of riders across the region.',
+      'Every person who walks through our doors is welcomed into the Royal Enfield brotherhood — a community bound not by horsepower alone, but by the spirit of adventure.'
+    ],
+    aboutStats: [
+      { id: 'legacy', value: '18', suffix: 'Yrs', label: 'In Business' },
+      { id: 'riders', value: '5000', suffix: '+', label: 'Happy Riders' },
+      { id: 'staff', value: '30', suffix: '+', label: 'Expert Staff' }
+    ]
+  });
 
 
   useEffect(() => {
@@ -137,7 +181,11 @@ export default function Home() {
 
       const homepageDoc = await getDoc(doc(db, 'settings', 'homepage'));
         if (homepageDoc.exists()) {
-            setHeroImage(homepageDoc.data().heroImage || '');
+            const data = homepageDoc.data() as any;
+            setHeroImage(data.heroImage || '');
+            if (data.homepageContent) {
+              setHomepageContent(data.homepageContent);
+            }
       }
 
       const featuredReviewsQuery = query(collection(db, "reviews"), where("featured", "==", true), orderBy("timestamp", "desc"));
@@ -379,18 +427,19 @@ export default function Home() {
           </div>
         </div>
         <div className="hero-stats">
-          <div className="hero-stat">
-            <div className="hero-stat-num">15+</div>
-            <div className="hero-stat-label">Models<br />Available</div>
-          </div>
-          <div className="hero-stat">
-            <div className="hero-stat-num">5K+</div>
-            <div className="hero-stat-label">Happy<br />Riders</div>
-          </div>
-          <div className="hero-stat">
-            <div className="hero-stat-num">18yr</div>
-            <div className="hero-stat-label">Authorized<br />Partner</div>
-          </div>
+          {homepageContent.heroStats.map((stat) => (
+            <div className="hero-stat" key={stat.id}>
+              <div className="hero-stat-num">{stat.value}</div>
+              <div className="hero-stat-label">
+                {stat.label.split(' ').map((word, index) => (
+                  <span key={`${stat.id}-${index}`}>
+                    {index > 0 && <br />}
+                    {word}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
         <div className="hero-scroll-indicator" aria-hidden="true">
           <span className="scroll-label">Scroll</span>
@@ -513,27 +562,17 @@ export default function Home() {
           </div>
           <div className="about-content">
             <span className="section-tag">Our Story</span>
-            <h2 className="section-title" id="about-title">Welcome to Royal Enfield Showroom - Funshine Getaways pvt ltd</h2>
-            <p>We are more than a dealership — we are custodians of a century-old legacy. Established in 2005, we
-              have grown to become one of the most trusted Royal Enfield authorized dealerships, serving thousands
-              of riders across the region.</p>
-            <p>Our state-of-the-art showroom spans over 10,000 sq. ft., featuring the complete Royal Enfield lineup
-              alongside expert consultation, authentic accessories, and a world-className service centre.</p>
-            <p>Every person who walks through our doors is welcomed into the Royal Enfield brotherhood — a community
-              bound not by horsepower alone, but by the spirit of adventure.</p>
+            <h2 className="section-title" id="about-title">{homepageContent.aboutTitle}</h2>
+            {homepageContent.aboutParagraphs.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
             <div className="about-stats">
-              <div className="about-stat">
-                <StatCounter target={5000} suffix="+" />
-                <div className="about-stat-label">Happy Riders</div>
-              </div>
-              <div className="about-stat">
-                <StatCounter target={18} suffix=" Yrs" />
-                <div className="about-stat-label">In Business</div>
-              </div>
-              <div className="about-stat">
-                <StatCounter target={30} suffix="+" />
-                <div className="about-stat-label">Expert Staff</div>
-              </div>
+              {homepageContent.aboutStats.map((stat) => (
+                <div className="about-stat" key={stat.id}>
+                  <StatCounter target={Number(stat.value)} suffix={stat.suffix} />
+                  <div className="about-stat-label">{stat.label}</div>
+                </div>
+              ))}
             </div>
             <a href="#test-ride" className="btn-primary">
               <i className="fa-solid fa-route"></i> Book Your Ride
@@ -745,22 +784,26 @@ export default function Home() {
         <div className="testimonials-track-wrap">
           <div className="testimonials-track" id="testimonials-track">
           {featuredReviews.length > 0 ? featuredReviews.map(review => (
-            <div className="testimonial-card" key={review.id}>
-              {review.featured && <div className="testimonial-badge">Featured</div>}
-              <div className="testimonial-quote">"</div>
-              <div className="testimonial-stars" aria-hidden="true">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i} style={{color: i < (review.rating || 0) ? 'var(--gold)' : '#e6e6e6'}}>★</span>
-                ))}
-              </div>
-              <p className="testimonial-text">{review.text}</p>
-              <div className="testimonial-author">
-                <div className="testimonial-avatar" aria-hidden="true">{(review.name || '').substring(0,2).toUpperCase()}</div>
-                <div>
-                  <div className="testimonial-name">{review.name}</div>
-                  {review.timestamp && <small className="testimonial-date">{new Date(review.timestamp?.toDate ? review.timestamp.toDate() : review.timestamp).toLocaleDateString()}</small>}
+            <div className="testimonial-card" key={review.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                {review.featured && <div className="testimonial-badge">Featured</div>}
+                <div className="testimonial-stars" aria-hidden="true" style={{ margin: '0 0 10px 0' }}>
+                    {[...Array(5)].map((_, i) => (
+                        <span key={i} style={{ color: i < (review.rating || 0) ? 'var(--gold)' : '#e6e6e6' }}>★</span>
+                    ))}
                 </div>
-              </div>
+                <p className="testimonial-text" style={{ flexGrow: 1, minHeight: 'unset', marginTop: '0' }}>
+                    <span className="testimonial-quote">“</span>
+                    {review.text}
+                </p>
+                <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: '20px' }}>
+                    <div className="testimonial-author">
+                        <div className="testimonial-avatar" aria-hidden="true">{(review.name || '').substring(0, 2).toUpperCase()}</div>
+                        <div>
+                            <div className="testimonial-name">{review.name}</div>
+                            {review.timestamp && <small className="testimonial-date">{new Date(review.timestamp?.toDate ? review.timestamp.toDate() : review.timestamp).toLocaleDateString()}</small>}
+                        </div>
+                    </div>
+                </div>
             </div>
           )) : <p>No featured reviews yet.</p>}
           </div>
@@ -793,8 +836,7 @@ export default function Home() {
               <div className="contact-icon"><i className="fa-solid fa-phone"></i></div>
               <div className="contact-item-body">
                 <h4>Sales &amp; Enquiries</h4>
-                <a href="tel:+911244567890">+91 124 456 7890</a><br />
-                <a href="tel:+919876543210">+91 9876543210</a>
+                <a href="tel:+918638707085">+91 8638707085</a><br/>
               </div>
             </div>
             <div className="contact-item">

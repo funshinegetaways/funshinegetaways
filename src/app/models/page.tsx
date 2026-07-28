@@ -1,5 +1,6 @@
 'use client';
 
+import { Metadata } from 'next';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { initializeApp, getApps, getApp } from 'firebase/app';
@@ -41,6 +42,31 @@ const filterOptions = [
     { id: 'continental-gt', name: 'Continental GT', icon: 'fa-solid fa-flag-checkered' },
     { id: 'interceptor', name: 'Interceptor', icon: 'fa-solid fa-fighter-jet' },
 ];
+
+export const metadata: Metadata = {
+  title: 'Models | Funshine Getaways',
+  description: 'Browse our full Royal Enfield motorcycle lineup and discover the model that matches your style and adventure.',
+  openGraph: {
+    title: 'Models | Funshine Getaways',
+    description: 'Browse our full Royal Enfield motorcycle lineup and discover the model that matches your style and adventure.',
+    type: 'website',
+    url: process.env.NEXT_PUBLIC_SITE_URL ? `${process.env.NEXT_PUBLIC_SITE_URL}/models` : 'http://localhost:3000/models',
+    siteName: 'Funshine Getaways',
+    images: [
+      {
+        url: process.env.NEXT_PUBLIC_SITE_URL ? `${process.env.NEXT_PUBLIC_SITE_URL}/assets/images/hunter350.png` : 'http://localhost:3000/assets/images/hunter350.png',
+        alt: 'Funshine Getaways Royal Enfield models',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Models | Funshine Getaways',
+    description: 'Browse our full Royal Enfield motorcycle lineup and discover the model that matches your style and adventure.',
+  },
+};
 
 const ModelsPage = () => {
   const [allModels, setAllModels] = useState<ProductData[]>([]);

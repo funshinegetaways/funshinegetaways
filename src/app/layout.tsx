@@ -7,6 +7,26 @@ import { Suspense } from 'react';
 export const metadata: Metadata = {
   title: 'Royal Enfield Showroom - Funshine Getaways pvt ltd',
   description: 'Authorised Royal Enfield dealership in Sivasagar. Discover the latest models, book a test ride, and experience the thrill of riding.',
+  openGraph: {
+    title: 'Royal Enfield Showroom - Funshine Getaways pvt ltd',
+    description: 'Authorised Royal Enfield dealership in Sivasagar. Discover the latest models, book a test ride, and experience the thrill of riding.',
+    type: 'website',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    siteName: 'Funshine Getaways',
+    images: [
+      {
+        url: process.env.NEXT_PUBLIC_SITE_URL ? `${process.env.NEXT_PUBLIC_SITE_URL}/assets/images/hunter350.png` : 'http://localhost:3000/assets/images/hunter350.png',
+        alt: 'Funshine Getaways Royal Enfield Showroom',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Royal Enfield Showroom - Funshine Getaways pvt ltd',
+    description: 'Authorised Royal Enfield dealership in Sivasagar. Discover the latest models, book a test ride, and experience the thrill of riding.',
+  },
 };
 
 export default function RootLayout({
