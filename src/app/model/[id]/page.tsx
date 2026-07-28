@@ -88,7 +88,7 @@ const ModelDetailPage = () => {
     const handleShare = async () => {
         const shareData = {
             title: product.name,
-            text: `${product.name} — starting at ₹${product.price.toLocaleString()} from Funshine Getaways.`,
+            text: `${product.name} — starting at ₹${product.price.toLocaleString()} from Funshine Getaways. \n`,
             url: currentPageUrl,
         };
 
