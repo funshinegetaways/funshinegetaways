@@ -163,7 +163,7 @@ const ReceiptPage = () => {
                     </div>
 
                     <h2 className="text-xl font-semibold mt-6 mb-4">Payment</h2>
-                     <div className="form-group">
+                    <div className="form-group">
                         <label>Payment Mode</label>
                         <select name="paymentMode" value={receiptData.paymentMode} onChange={handleInputChange}>
                             <option>Cash</option>
@@ -186,7 +186,7 @@ const ReceiptPage = () => {
                     ))}
                     <button onClick={addAdditionalDetail} className="btn-outline mt-2"><i className="fa-solid fa-plus"></i> Add Detail</button>
                 </div>
-                
+
                 <div id="receipt-preview" className="receipt-preview-paper">
                     <h2 className="text-2xl font-bold text-center mb-4" style={{ fontFamily: 'var(--font-heading)', color: '#121212', letterSpacing: '0.05em' }}>INVOICE</h2>
                     <div className="receipt-preview-header">
@@ -194,7 +194,7 @@ const ReceiptPage = () => {
                             <p style={{ margin: 0 }}><strong>Funshine Getaways Pvt Ltd</strong></p>
                             <p style={{ margin: 0, fontSize: '0.85rem' }}>Authorized Royal Enfield Dealership</p>
                             <p style={{ margin: 0, fontSize: '0.85rem' }}>AT Rd, near ASTC Bus Stand, Sivasagar</p>
-                            <p style={{ margin: 0, fontSize: '0.85rem' }}>Phone: +91 124 456 7890</p>
+                            <p style={{ margin: 0, fontSize: '0.85rem' }}>Phone: +91 86387 07085</p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
                             <p style={{ margin: 0, fontSize: '0.9rem' }}><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
@@ -203,10 +203,10 @@ const ReceiptPage = () => {
                     </div>
                     <hr style={{ margin: '16px 0', border: 0, borderTop: '1px solid #e2e8f0' }} />
                     <div className="mb-4">
-                         <h3 className="font-semibold" style={{ margin: '0 0 4px 0', fontSize: '0.95rem' }}>Billed To:</h3>
-                         <p style={{ margin: 0 }}>{receiptData.buyerName || 'Customer Name'}</p>
-                         <p style={{ margin: 0, fontSize: '0.85rem' }}>{receiptData.buyerAddress || 'Address details'}</p>
-                         <p style={{ margin: 0, fontSize: '0.85rem' }}>{receiptData.buyerPhone || 'Phone number'}</p>
+                        <h3 className="font-semibold" style={{ margin: '0 0 4px 0', fontSize: '0.95rem' }}>Billed To:</h3>
+                        <p style={{ margin: 0 }}>{receiptData.buyerName || 'Customer Name'}</p>
+                        <p style={{ margin: 0, fontSize: '0.85rem' }}>{receiptData.buyerAddress || 'Address details'}</p>
+                        <p style={{ margin: 0, fontSize: '0.85rem' }}>{receiptData.buyerPhone || 'Phone number'}</p>
                     </div>
                     <table className="receipt-details-table">
                         <thead>
@@ -216,10 +216,10 @@ const ReceiptPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                             <tr><td>Ex-Showroom Price ({receiptData.bikeModel || 'Selected Model'})</td><td className="text-right">&#8377; {receiptData.exShowroomPrice.toLocaleString()}</td></tr>
-                             <tr><td>RTO Registration & Road Tax</td><td className="text-right">&#8377; {receiptData.rtoPrice.toLocaleString()}</td></tr>
-                             <tr><td>Comprehensive Insurance</td><td className="text-right">&#8377; {receiptData.insurancePrice.toLocaleString()}</td></tr>
-                             {receiptData.additionalDetails.map((detail, index) => (
+                            <tr><td>Ex-Showroom Price ({receiptData.bikeModel || 'Selected Model'})</td><td className="text-right">&#8377; {receiptData.exShowroomPrice.toLocaleString()}</td></tr>
+                            <tr><td>RTO Registration & Road Tax</td><td className="text-right">&#8377; {receiptData.rtoPrice.toLocaleString()}</td></tr>
+                            <tr><td>Comprehensive Insurance</td><td className="text-right">&#8377; {receiptData.insurancePrice.toLocaleString()}</td></tr>
+                            {receiptData.additionalDetails.map((detail, index) => (
                                 <tr key={index}><td>{detail.key || 'Additional Charge'}</td><td className="text-right">&#8377; {Number(detail.value || 0).toLocaleString()}</td></tr>
                             ))}
                         </tbody>
@@ -227,7 +227,7 @@ const ReceiptPage = () => {
                             <tr className="total-row"><td>Total Amount Paid</td><td className="text-right">&#8377; {receiptData.totalPrice.toLocaleString()}</td></tr>
                         </tfoot>
                     </table>
-                     <div className="mt-6" style={{ fontSize: '0.9rem' }}>
+                    <div className="mt-6" style={{ fontSize: '0.9rem' }}>
                         <p style={{ margin: 0 }}><strong>Payment Mode:</strong> {receiptData.paymentMode}</p>
                         {receiptData.transactionId && <p style={{ margin: 0 }}><strong>Transaction / Auth ID:</strong> {receiptData.transactionId}</p>}
                     </div>

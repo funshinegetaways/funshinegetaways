@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 import { getAuth, signOut } from 'firebase/auth';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
@@ -13,42 +11,38 @@ const firebaseConfig = {
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
     storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
+// ─── Admin Layout ───────────────────────────────────────────────────────────────
+// NOTE: Route protection is handled entirely by src/middleware.ts which verifies
+// the httpOnly "admin-session" cookie server-side on every request.
+// Do NOT try to read that cookie client-side — httpOnly cookies are intentionally
+// inaccessible to JavaScript for security reasons.
+
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     const pathname = usePathname();
     const router = useRouter();
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-    useEffect(() => {
-        const hasSession = !!Cookies.get('admin-session');
-        setIsAuthenticated(hasSession);
-        
-        // If not authenticated, redirect to /login
-        if (!hasSession) {
-            router.push('/login');
-        }
-    }, [pathname, router]);
-
-    if (isAuthenticated === null) {
-        return (
-            <div className="login-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-primary)' }}>
-                <h1 style={{ color: 'var(--gold)', fontFamily: 'var(--font-heading)', fontSize: '2.5rem', letterSpacing: '0.1em' }}>LOADING...</h1>
-            </div>
-        );
-    }
 
     const handleSignOut = async () => {
         try {
+            // 1. Sign out of Firebase client auth
             await signOut(auth);
         } catch (error) {
             console.error('Firebase sign out error', error);
         }
-        Cookies.remove('admin-session');
+
+        try {
+            // 2. Clear the httpOnly session cookie via the server-side API
+            await fetch('/api/admin/logout', { method: 'POST' });
+        } catch (error) {
+            console.error('Logout API error', error);
+        }
+
+        // 3. Navigate to login
         router.push('/login');
     };
 

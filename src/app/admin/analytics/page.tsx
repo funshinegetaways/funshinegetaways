@@ -92,7 +92,11 @@ export default function AnalyticsPage() {
   const fb = data.firebase;
 
   const [activeUsers, pageViews, sessions, avgSessionDuration, engagementRate] = ga?.mainReport?.totals?.[0]?.metricValues.map(m => m.value) || Array(5).fill('0');
-  const pagesData = ga?.pagesReport?.rows?.map(row => [row.dimensionValues[0].value, parseInt(row.metricValues[0].value, 10)]) || [];
+  const pagesData = ga?.pagesReport?.rows?.map(row => [
+    row.dimensionValues[1].value || '/',
+    row.dimensionValues[0].value || 'Default Title',
+    parseInt(row.metricValues[0].value, 10)
+  ]) || [];
   const devicesData = ga?.devicesReport?.rows?.map(row => [row.dimensionValues[0].value, parseInt(row.metricValues[0].value, 10)]) || [];
   const citiesData = ga?.citiesReport?.rows?.map(row => [row.dimensionValues[0].value, parseInt(row.metricValues[0].value, 10)]) || [];
   const osData = ga?.osReport?.rows?.map(row => [row.dimensionValues[0].value, parseInt(row.metricValues[0].value, 10)]) || [];
@@ -130,7 +134,7 @@ export default function AnalyticsPage() {
         <div className="mt-6">
             <DataTable 
               title="Top Pages by Views" 
-              headers={['Page Title', 'Views']}
+              headers={['Page Path', 'Page Title', 'Views']}
               data={pagesData} 
             />
         </div>

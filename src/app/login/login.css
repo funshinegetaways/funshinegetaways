@@ -1,92 +1,402 @@
 
-.login-container {
+/* ============================================================
+   Funshine Getaways – Admin Login Page
+   Premium glassmorphism design with animated particle canvas
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap');
+
+/* ── Root / background ─────────────────────────────────────── */
+.lp-root {
+  position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
-  background-image: url('/background.jpg');
-  background-size: cover;
-  background-position: center;
+  background: radial-gradient(ellipse at 20% 50%, #0d1117 0%, #09090f 100%);
+  overflow: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.login-box {
-  padding: 2.5rem;
-  text-align: center;
-  border-radius: 15px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  width: 100%;
-  max-width: 400px;
+.lp-canvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+/* Decorative gradient orbs */
+.lp-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
 }
 
-.login-box h2 {
-  margin-bottom: 0.5rem;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
+.lp-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 70%);
+  top: -120px;
+  left: -120px;
+  animation: orbDrift1 18s ease-in-out infinite alternate;
 }
 
-.login-box p {
-  margin-bottom: 1.5rem;
-  color: #eee;
-  font-size: 1rem;
+.lp-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(139, 90, 220, 0.12) 0%, transparent 70%);
+  bottom: -80px;
+  right: -80px;
+  animation: orbDrift2 22s ease-in-out infinite alternate;
 }
 
-.login-form {
+@keyframes orbDrift1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(60px, 40px) scale(1.1); }
+}
+@keyframes orbDrift2 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(-40px, -60px) scale(1.15); }
+}
+
+/* ── Center wrapper ────────────────────────────────────────── */
+.lp-center {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.input-group input {
+  align-items: center;
+  gap: 1.75rem;
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.2);
-  color: #fff;
-  font-size: 1rem;
+  padding: 2rem 1rem;
 }
 
-.input-group input::placeholder {
-  color: #ccc;
+/* ── Brand mark ────────────────────────────────────────────── */
+.lp-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: fadeDown 0.6s ease both;
 }
 
-.btn-primary {
+.lp-brand-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.5));
+}
+
+.lp-brand-icon svg {
   width: 100%;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  background-color: #ffffff;
-  color: #1a1a1a;
+  height: 100%;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background-color: #f0f0f0;
+.lp-brand-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: linear-gradient(135deg, #D4AF37, #F5D76E, #D4AF37);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
 }
 
-.btn-primary:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+@keyframes shimmer {
+  from { background-position: 0% center; }
+  to   { background-position: 200% center; }
 }
 
-.error-message {
-  margin-top: 1rem;
-  color: #ffbaba;
-  background-color: rgba(255, 0, 0, 0.2);
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+/* ── Card ──────────────────────────────────────────────────── */
+.lp-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  padding: 2.5rem 2.25rem;
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.08),
+    0 32px 64px -16px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: fadeUp 0.7s ease both 0.1s;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Card header ───────────────────────────────────────────── */
+.lp-card-header {
   text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.lp-title {
+  margin: 0 0 0.4rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.lp-subtitle {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.02em;
+}
+
+/* ── Error banner ──────────────────────────────────────────── */
+.lp-error {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  color: #fca5a5;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  animation: shake 0.4s ease;
+}
+
+.lp-error svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* ── Form & Fields ─────────────────────────────────────────── */
+.lp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.lp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.lp-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.lp-field--focused .lp-label {
+  color: #D4AF37;
+}
+
+.lp-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.lp-input-icon {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  transition: color 0.2s;
+}
+
+.lp-input-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.lp-field--focused .lp-input-icon {
+  color: #D4AF37;
+}
+
+.lp-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.lp-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.lp-input:focus {
+  border-color: rgba(212, 175, 55, 0.6);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.lp-input--password {
+  padding-right: 3rem;
+}
+
+.lp-toggle-pw {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.45);
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.lp-toggle-pw:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.lp-toggle-pw:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.6);
+  border-radius: 4px;
+}
+
+.lp-toggle-pw svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Submit button ─────────────────────────────────────────── */
+.lp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.9rem 1.5rem;
+  background: linear-gradient(135deg, #C9A227, #E8C547, #C9A227);
+  background-size: 200% auto;
+  border: none;
+  border-radius: 10px;
+  color: #1a1200;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background-position 0.4s, transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 4px 20px rgba(201, 162, 39, 0.3);
+}
+
+.lp-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.25s;
+}
+
+.lp-btn:hover:not(:disabled) {
+  background-position: right center;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(201, 162, 39, 0.45);
+}
+
+.lp-btn:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+.lp-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.lp-btn:disabled,
+.lp-btn--loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Spinner */
+.lp-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(26, 18, 0, 0.3);
+  border-top-color: #1a1200;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Footer note ───────────────────────────────────────────── */
+.lp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.02em;
+}
+
+.lp-lock-icon {
+  display: flex;
+  align-items: center;
+}
+
+.lp-lock-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .lp-card {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+
+  .lp-title {
+    font-size: 1.5rem;
+  }
+
+  .lp-orb-1, .lp-orb-2 {
+    display: none;
+  }
 }

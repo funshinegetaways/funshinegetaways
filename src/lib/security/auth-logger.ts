@@ -9,7 +9,7 @@ interface LogInfo {
 
 // This is a simplified, non-blocking logger.
 // For production, you might want to send these logs to a service like Datadog, Sentry, or a logging database.
-export const logLoginAttempt = (req: NextRequest, info: LogInfo): void => {
+export const logLoginAttempt = (req: NextRequest, info: LogInfo): Promise<void> => {
     const ip = getIp(req);
     const email = req.headers.get('X-User-Email') || 'unknown'; // The email can be added to the header by the main route
 
@@ -27,4 +27,5 @@ export const logLoginAttempt = (req: NextRequest, info: LogInfo): void => {
     // In a real-world scenario, you would not log to the console in production.
     // Instead, you'd use a proper logging service.
     console.log('Login Attempt:', JSON.stringify(logData, null, 2));
+    return Promise.resolve();
 };
