@@ -1,154 +1,89 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
-import Cookies from 'js-cookie';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import '../globals.css';
+import './login.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (Cookies.get('admin-session')) {
-        router.push('/admin');
-      } else {
-        setPageLoading(false);
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
-  const processSignIn = async (user) => {
+    if (!email || !password) {
+        setError('Please enter both email and password.');
+        setIsLoading(false);
+        return;
+    }
+
     try {
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
 
-      if (userDoc.exists()) {
-        if (userDoc.data().isAdmin) {
-          Cookies.set('admin-session', 'true', { expires: 1 });
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        if (data.isAdmin) {
           router.push('/admin');
         } else {
-          await signOut(auth);
-          setError('Access Denied: You do not have administrator permissions.');
+          // This case should ideally not be hit if you only create admin users
+          setError('You are not an authorized administrator.');
         }
       } else {
-        await setDoc(userDocRef, {
-          email: user.email,
-          displayName: user.displayName || user.email,
-          createdAt: serverTimestamp(),
-          isAdmin: false
-        });
-        await signOut(auth);
-        setError('Your account has been created and is pending approval from an administrator.');
+        setError(data.error || 'Login failed. Please check your credentials.');
       }
-    } catch (err) {
-      setError(err.message || 'An error occurred during verification.');
-      if (auth.currentUser) await signOut(auth);
+    } catch (error) {
+      setError('Invalid email or password.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    signInWithEmailAndPassword(auth, email, password)
-      .then(userCredential => processSignIn(userCredential.user))
-      .catch(err => {
-        if (err.code === 'auth/user-not-found') {
-          setError('No user found with this email. Please use the correct email or Google Sign-In.');
-        } else if (err.code === 'auth/wrong-password') {
-          setError('Incorrect password. Please try again.');
-        } else {
-          setError('Invalid credentials. Please try again.');
-        }
-        setLoading(false);
-      });
-  };
-
-  const handleGoogleSignIn = () => {
-    setError('');
-    setLoading(true);
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider)
-      .then(result => processSignIn(result.user))
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
-  };
-
-  if (pageLoading) {
-    return (
-      <div className="login-container">
-        <div className="loading-spinner"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="login-container">
-      <div className="login-form glass-card" style={{ position: 'relative' }}>
-        {loading && (
-          <div className="loading-overlay">
-            <div className="loading-spinner"></div>
-          </div>
-        )}
-        <h1 className="form-title">Admin Login</h1>
+      <div className="login-box glass-card">
+        <h2>Admin Login</h2>
+        <p>Royal Enfield Dealership</p>
         {error && <p className="error-message">{error}</p>}
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+        <form onSubmit={handleEmailLogin} className="login-form">
+          <div className="input-group">
             <input
               type="email"
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
+              placeholder="Email"
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                required
-              />
-              <span 
-                onClick={() => setShowPassword(!showPassword)} 
-                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer' }}>
-                <i className={`fa-regular ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
-              </span>
-            </div>
+          <div className="input-group">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+            />
           </div>
-          <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '24px' }} disabled={loading}>
-            {loading ? 'Signing In...' : 'Sign In'}
+          <button type="submit" className="btn-primary" disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '16px 0' }}>
-            <hr style={{flex: 1, borderColor: 'rgba(255,255,255,0.1)'}} />
-            <span style={{color: 'var(--text-muted)'}}>OR</span>
-            <hr style={{flex: 1, borderColor: 'rgba(255,255,255,0.1)'}} />
-        </div>
-        <button onClick={handleGoogleSignIn} className="btn-outline google-login" style={{width: '100%'}} disabled={loading}>
-            <i className="fa-brands fa-google"></i> &nbsp; Sign in with Google
-        </button>
       </div>
     </div>
   );
