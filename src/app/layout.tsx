@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Analytics } from '@/components/Analytics';
+import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 import SectionPageShell from '@/components/SectionPageShell';
 import { Suspense } from 'react';
 
@@ -146,6 +147,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>
+        <VercelAnalytics />
       </body>
     </html>
   );
